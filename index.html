@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스포츠 이상형 월드컵</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    margin: 20px auto;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+  }
+  .sport-btn {
+    margin: 10px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .sport-btn img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: filter 0.3s ease;
+  }
+  .sport-btn:hover img {
+    filter: brightness(80%);
+  }
+  h1, p, h2 {
+    text-align: center;
+  }
+  .final-image {
+    margin: 20px auto;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    display: block;
+  }
+  .final-btn {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #3376B9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90%;
+    max-width: 200px;
+  }
+  .final-btn:hover {
+    background-color: #3376B9;
+  }
+  @media screen and (max-width: 768px) {
+    .sport-btn {
+      display: block;
+      width: 100%;
+    }
+    .sport-btn img {
+      width: 100%;
+      height: auto;
+    }
+  }
+  @media screen and (min-width: 769px) {
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .sport-btn {
+      display: inline-block;
+      width: 45%;
+    }
+    .sport-btn img {
+      width: 100%;
+      height: auto;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>스포츠 이상형 월드컵</h1>
+<p>16개의 스포츠 중 이상형을 선택하세요!</p>
+
+<div class="container" id="game-container"></div>
+
+<div id="final-result" style="font-size: 24px; font-weight: bold;"></div>
+
+<script>
+  const sports = [
+    "골프", "농구", "배구", "배드민턴",
+    "러닝", "탁구", "클라이밍", "복싱",
+    "야구", "양궁", "펜싱", "테니스",
+    "주짓수", "태권도", "풋살", "수영"
+  ];
+
+  let currentRound = [];
+  let nextRound = [];
+  let round = 1;
+
+  window.onload = showIntroPage;
+
+
+  function showIntroPage() {
+    const container = document.getElementById("game-container");
+    container.innerHTML = `
+      <div style="text-align: center; margin-top: 5%;">
+        <img src="images/intro.jpg" alt="스포츠 이상형 월드컵 시작하기" 
+             style="width: 100%; max-width: 500px; height: auto; border-radius: 10px; cursor: pointer;" 
+             onclick="startGame()">
+      </div>
+    `;
+}
+
+
+  function startGame() {
+    round = 1;
+    nextRound = [];
+    currentRound = [...sports];
+    shuffle(currentRound);
+    showMatch();
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function showMatch() {
+    const container = document.getElementById("game-container");
+
+    if (currentRound.length === 1) {
+      displayFinalResult(currentRound[0]);
+      return;
+    }
+
+    const sport1 = currentRound.shift();
+    const sport2 = currentRound.shift();
+
+    container.innerHTML = `
+      <button class="sport-btn" onclick="chooseSport('${sport1}')">
+        <img src="images/${sport1}.jpg" alt="${sport1}">
+      </button>
+      <button class="sport-btn" onclick="chooseSport('${sport2}')">
+        <img src="images/${sport2}.jpg" alt="${sport2}">
+      </button>
+    `;
+  }
+
+  function chooseSport(winner) {
+    nextRound.push(winner);
+    if (currentRound.length === 0) {
+      if (nextRound.length === 1) {
+        displayFinalResult(nextRound[0]);
+      } else {
+        currentRound = [...nextRound];
+        nextRound = [];
+        round++;
+        showNextRoundPage();
+      }
+    } else {
+      showMatch();
+    }
+  }
+
+  function showNextRoundPage() {
+    const container = document.getElementById("game-container");
+    container.innerHTML = `
+      <div style="text-align: center; margin-top: 20%; padding: 20px;">
+        <h2>${round}라운드로 넘어갑니다!</h2>
+        <button class="final-btn" onclick="showMatch()">다음 라운드 시작하기</button>
+      </div>
+    `;
+  }
+
+  function displayFinalResult(winningSport) {
+    const container = document.getElementById("game-container");
+    container.innerHTML = `
+      <div style="text-align: center;">
+        <img src="images/${winningSport}_final.jpg" alt="${winningSport}" class="final-image" style="margin: 20px auto;">
+        <h2>당신의 스포츠 이상형은 ${winningSport}입니다!</h2>
+        <div class="btn-group">
+          <button class="final-btn" onclick="showIntroPage()">검사 다시 시작하기</button>
+          <button class="final-btn" onclick="redirectToClass('${winningSport}')">관련 클래스 보기</button>
+        </div>
+        <div class="btn-group">
+          <button class="final-btn" onclick="saveImage()">사진 저장하기</button>
+          <button class="final-btn" onclick="shareResultMobile()">결과 공유하기</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function redirectToClass(sport) {
+    const urlMapping = {
+      "골프": "golf",
+      "농구": "basketball",
+      "배구": "volleyball",
+      "배드민턴": "badminton",
+      "러닝": "running",
+      "탁구": "tabletennis",
+      "클라이밍": "climbing",
+      "복싱": "boxing",
+      "야구": "baseball",
+      "양궁": "archery",
+      "펜싱": "fencing",
+      "테니스": "tennis",
+      "주짓수": "jiujitsu",
+      "태권도": "taekwondo",
+      "풋살": "futsal",
+      "수영": "swimming"
+    };
+
+    const sportPath = urlMapping[sport];
+    if (sportPath) {
+      window.open(`https://www.rookieplay.co.kr/${sportPath}`, '_blank');
+    } else {
+      alert("관련 클래스 정보를 찾을 수 없습니다!");
+    }
+  }
+
+  function saveImage() {
+    const winningSport = document.querySelector(".final-image").src;
+    const link = document.createElement("a");
+    link.href = winningSport;
+    link.download = "sports_result.jpg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    alert("이미지가 저장되었습니다!");
+  }
+
+  function shareResultMobile() {
+    const winningSport = document.querySelector(".final-image").alt;
+    const shareText = `내 스포츠 이상형은 ${winningSport}입니다! RookiePlay에서 확인해보세요.`;
+    const shareURL = "https://www.rookieplay.co.kr";
+
+    if (navigator.share) {
+      navigator.share({
+        title: "스포츠 이상형 월드컵",
+        text: shareText,
+        url: shareURL
+      })
+      .then(() => console.log("공유 성공"))
+      .catch((error) => console.error("공유 실패:", error));
+    } else {
+      alert("공유 기능이 지원되지 않는 브라우저입니다. 이미지를 직접 저장하여 공유하세요!");
+    }
+  }
+</script>
+
+</body>
+</html>
